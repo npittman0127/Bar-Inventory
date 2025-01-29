@@ -1,26 +1,139 @@
-document.getElementById('bar-form')?.addEventListener('submit', function (e) {
-  e.preventDefault();
-  const beerName = document.getElementById('beer-name').value;
-  const kegPercentage = parseFloat(document.getElementById('keg-percentage').value);
-  const liquorType = document.getElementById('liquor-type').value;
-  const liquorName = document.getElementById('liquor-name').value;
-  const liquorCount = parseInt(document.getElementById('liquor-count').value);
-  const bottlePercentage = parseFloat(document.getElementById('bottle-percentage').value);
-  const wineName = document.getElementById('wine-name').value;
-  const wineCount = parseInt(document.getElementById('wine-count').value);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Behind the Bar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Behind the Bar Inventory</h1>
+  </header>
+  <main>
+    <a href="index.html" class="back-button">Back to Home</a>
+    <section>
+      <h2>Add/Update Inventory</h2>
+      <form id="bar-form">
+        <!-- Beer Section -->
+        <h3>Beer</h3>
+        <label for="beer-name">Beer Name:</label>
+        <input type="text" id="beer-name">
+        <label for="keg-percentage">Keg Percentage (Decimal):</label>
+        <input type="number" step="0.01" id="keg-percentage" min="0" max="1">
 
-  // Update inventory
-  if (beerName) {
-    inventory.behindTheBar.beer.push({ name: beerName, kegPercentage, bottleCount: 0 });
-  }
-  if (liquorName) {
-    inventory.behindTheBar.liquor.push({ type: liquorType, name: liquorName, bottleCount: liquorCount, bottlePercentage });
-  }
-  if (wineName) {
-    inventory.behindTheBar.wine.push({ name: wineName, bottleCount: wineCount });
-  }
+        <!-- Liquor Section -->
+        <h3>Liquor</h3>
+        <label for="liquor-type">Liquor Type:</label>
+        <select id="liquor-type">
+          <option value="vodka">Vodka</option>
+          <option value="whiskey">Whiskey</option>
+          <option value="rum">Rum</option>
+          <option value="tequila">Tequila</option>
+          <option value="gin">Gin</option>
+        </select>
+        <label for="liquor-name">Liquor Name:</label>
+        <input type="text" id="liquor-name">
+        <label for="liquor-count">Bottle Count:</label>
+        <input type="number" id="liquor-count">
+        <label for="bottle-percentage">Bottle Percentage (Decimal):</label>
+        <input type="number" step="0.01" id="bottle-percentage" min="0" max="1">
 
-  // Save and update display
-  saveInventory();
-  updateDisplay();
-});
+        <!-- Wine Section -->
+        <h3>Wine</h3>
+        <label for="wine-name">Wine Name:</label>
+        <input type="text" id="wine-name">
+        <label for="wine-count">Bottle Count:</label>
+        <input type="number" id="wine-count">
+
+        <button type="submit">Add/Update</button>
+      </form>
+    </section>
+    <section>
+      <h2>Current Inventory</h2>
+      <ul id="bar-list"></ul>
+    </section>
+  </main>
+  <script src="script.js"></script>
+  <script>
+    // Load inventory data from localStorage
+    let inventory = JSON.parse(localStorage.getItem('inventory')) || {
+      wineCabinet: [],
+      behindTheBar: { beer: [], liquor: [], wine: [] },
+      storage: { beer: [], liquor: [], wine: [] }
+    };
+
+    // Handle form submission
+    document.getElementById('bar-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const beerName = document.getElementById('beer-name').value;
+      const kegPercentage = parseFloat(document.getElementById('keg-percentage').value);
+      const liquorType = document.getElementById('liquor-type').value;
+      const liquorName = document.getElementById('liquor-name').value;
+      const liquorCount = parseInt(document.getElementById('liquor-count').value);
+      const bottlePercentage = parseFloat(document.getElementById('bottle-percentage').value);
+      const wineName = document.getElementById('wine-name').value;
+      const wineCount = parseInt(document.getElementById('wine-count').value);
+
+      // Add or update beer
+      if (beerName) {
+        const existingBeer = inventory.behindTheBar.beer.find(beer => beer.name === beerName);
+        if (existingBeer) {
+          existingBeer.kegPercentage = kegPercentage;
+        } else {
+          inventory.behindTheBar.beer.push({ name: beerName, kegPercentage, bottleCount: 0 });
+        }
+      }
+
+      // Add or update liquor
+      if (liquorName) {
+        const existingLiquor = inventory.behindTheBar.liquor.find(liquor => liquor.name === liquorName);
+        if (existingLiquor) {
+          existingLiquor.bottleCount = liquorCount;
+          existingLiquor.bottlePercentage = bottlePercentage;
+        } else {
+          inventory.behindTheBar.liquor.push({ type: liquorType, name: liquorName, bottleCount: liquorCount, bottlePercentage });
+        }
+      }
+
+      // Add or update wine
+      if (wineName) {
+        const existingWine = inventory.behindTheBar.wine.find(wine => wine.name === wineName);
+        if (existingWine) {
+          existingWine.bottleCount = wineCount;
+        } else {
+          inventory.behindTheBar.wine.push({ name: wineName, bottleCount: wineCount });
+        }
+      }
+
+      // Save and update display
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      updateDisplay();
+    });
+
+    // Update display
+    function updateDisplay() {
+      const barList = document.getElementById('bar-list');
+      barList.innerHTML = '';
+      inventory.behindTheBar.beer.forEach(beer => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${beer.name}: ${beer.bottleCount} bottles, Keg: ${beer.kegPercentage * 100}%`;
+        barList.appendChild(listItem);
+      });
+      inventory.behindTheBar.liquor.forEach(liquor => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${liquor.name} (${liquor.type}): ${liquor.bottleCount} bottles, ${liquor.bottlePercentage * 100}% full`;
+        barList.appendChild(listItem);
+      });
+      inventory.behindTheBar.wine.forEach(wine => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${wine.name}: ${wine.bottleCount} bottles`;
+        barList.appendChild(listItem);
+      });
+    }
+
+    // Load inventory when the page loads
+    document.addEventListener('DOMContentLoaded', updateDisplay);
+  </script>
+</body>
+</html>
