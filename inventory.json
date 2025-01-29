@@ -1,0 +1,62 @@
+{
+  "wineCabinet": [
+    {
+      "name": "Cabernet Sauvignon",
+      "bottleCount": 12
+    },
+    {
+      "name": "Chardonnay",
+      "bottleCount": 8
+    }
+  ],
+  "behindTheBar": {
+    "beer": [
+      {
+        "name": "IPA",
+        "kegPercentage": 0.75,
+        "bottleCount": 5
+      }
+    ],
+    "liquor": [
+      {
+        "type": "Vodka",
+        "bottleCount": 3,
+        "bottlePercentage": 0.5
+      },
+      {
+        "type": "Whiskey",
+        "bottleCount": 2,
+        "bottlePercentage": 0.25
+      }
+    ],
+    "wine": [
+      {
+        "name": "Merlot",
+        "bottleCount": 4
+      }
+    ]
+  },
+  "storage": {
+    "beer": [
+      {
+        "name": "Lager",
+        "caseCount": 2,
+        "bottleCount": 12
+      }
+    ],
+    "liquor": [
+      {
+        "type": "Rum",
+        "caseCount": 1,
+        "bottleCount": 6
+      }
+    ],
+    "wine": [
+      {
+        "name": "Pinot Noir",
+        "caseCount": 3,
+        "bottleCount": 18
+      }
+    ]
+  }
+}
