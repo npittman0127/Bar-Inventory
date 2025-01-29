@@ -28,5 +28,46 @@
     </section>
   </main>
   <script src="script.js"></script>
+  <script>
+    // Load inventory data from localStorage
+    let inventory = JSON.parse(localStorage.getItem('inventory')) || {
+      wineCabinet: [],
+      behindTheBar: { beer: [], liquor: [], wine: [] },
+      storage: { beer: [], liquor: [], wine: [] }
+    };
+
+    // Handle form submission
+    document.getElementById('wine-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const wineName = document.getElementById('wine-name').value;
+      const wineCount = parseInt(document.getElementById('wine-count').value);
+
+      // Add or update wine in inventory
+      const existingWine = inventory.wineCabinet.find(wine => wine.name === wineName);
+      if (existingWine) {
+        existingWine.bottleCount = wineCount; // Update existing wine
+      } else {
+        inventory.wineCabinet.push({ name: wineName, bottleCount: wineCount }); // Add new wine
+      }
+
+      // Save and update display
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      updateDisplay();
+    });
+
+    // Update display
+    function updateDisplay() {
+      const wineList = document.getElementById('wine-list');
+      wineList.innerHTML = '';
+      inventory.wineCabinet.forEach(wine => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${wine.name}: ${wine.bottleCount} bottles`;
+        wineList.appendChild(listItem);
+      });
+    }
+
+    // Load inventory when the page loads
+    document.addEventListener('DOMContentLoaded', updateDisplay);
+  </script>
 </body>
 </html>
