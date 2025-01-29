@@ -1,15 +1,12 @@
-// Load liquor list for display and editing
-let liquorList = [];
+// Load inventory data from localStorage
+let inventory = JSON.parse(localStorage.getItem('inventory')) || {
+  wineCabinet: [],
+  behindTheBar: { beer: [], liquor: [], wine: [] },
+  storage: { beer: [], liquor: [], wine: [] }
+};
 
-function loadLiquorList() {
-  fetch('liquor-list.json')
-    .then(response => response.json())
-    .then(data => {
-      liquorList = data;
-      displayLiquorList();
-    })
-    .catch(error => console.error('Error loading liquor list:', error));
-}
+// Load liquor list for display and editing
+let liquorList = JSON.parse(localStorage.getItem('liquorList')) || [];
 
 // Display liquor list on the front page
 function displayLiquorList() {
@@ -24,6 +21,52 @@ function displayLiquorList() {
         <button onclick="removeLiquor(${index})">Remove</button>
       `;
       liquorListElement.appendChild(listItem);
+    });
+  }
+}
+
+// Display current inventory on the front page
+function displayCurrentInventory() {
+  const currentInventoryElement = document.getElementById('current-inventory');
+  if (currentInventoryElement) {
+    currentInventoryElement.innerHTML = '';
+    // Wine Cabinet
+    inventory.wineCabinet.forEach(wine => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Wine Cabinet: ${wine.name} - ${wine.bottleCount} bottles`;
+      currentInventoryElement.appendChild(listItem);
+    });
+    // Behind the Bar
+    inventory.behindTheBar.beer.forEach(beer => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Behind the Bar (Beer): ${beer.name} - ${beer.bottleCount} bottles, Keg: ${beer.kegPercentage * 100}%`;
+      currentInventoryElement.appendChild(listItem);
+    });
+    inventory.behindTheBar.liquor.forEach(liquor => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Behind the Bar (Liquor): ${liquor.name} (${liquor.type}) - ${liquor.bottleCount} bottles, ${liquor.bottlePercentage * 100}% full`;
+      currentInventoryElement.appendChild(listItem);
+    });
+    inventory.behindTheBar.wine.forEach(wine => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Behind the Bar (Wine): ${wine.name} - ${wine.bottleCount} bottles`;
+      currentInventoryElement.appendChild(listItem);
+    });
+    // Storage
+    inventory.storage.beer.forEach(beer => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Storage (Beer): ${beer.name} - ${beer.caseCount} cases, ${beer.bottleCount} bottles`;
+      currentInventoryElement.appendChild(listItem);
+    });
+    inventory.storage.liquor.forEach(liquor => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Storage (Liquor): ${liquor.name} (${liquor.type}) - ${liquor.caseCount} cases, ${liquor.bottleCount} bottles`;
+      currentInventoryElement.appendChild(listItem);
+    });
+    inventory.storage.wine.forEach(wine => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `Storage (Wine): ${wine.name} - ${wine.caseCount} cases, ${wine.bottleCount} bottles`;
+      currentInventoryElement.appendChild(listItem);
     });
   }
 }
@@ -59,12 +102,17 @@ function removeLiquor(index) {
   }
 }
 
-// Save liquor list (simulate saving to a backend)
+// Save liquor list to localStorage
 function saveLiquorList() {
-  // For now, we'll just log the updated list
-  console.log('Updated Liquor List:', liquorList);
-  // In a real app, you'd send this data to a backend to save to liquor-list.json
+  localStorage.setItem('liquorList', JSON.stringify(liquorList));
 }
 
-// Load liquor list when the page loads
-document.addEventListener('DOMContentLoaded', loadLiquorList);
+// Save inventory to localStorage
+function saveInventory() {
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+}
+
+// Load data when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  displayLiquorList();
+  displayCurrentInventory();
