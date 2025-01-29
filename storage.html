@@ -59,5 +59,89 @@
     </section>
   </main>
   <script src="script.js"></script>
+  <script>
+    // Load inventory data from localStorage
+    let inventory = JSON.parse(localStorage.getItem('inventory')) || {
+      wineCabinet: [],
+      behindTheBar: { beer: [], liquor: [], wine: [] },
+      storage: { beer: [], liquor: [], wine: [] }
+    };
+
+    // Handle form submission
+    document.getElementById('storage-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const beerName = document.getElementById('beer-name').value;
+      const beerCaseCount = parseInt(document.getElementById('beer-case-count').value);
+      const beerBottleCount = parseInt(document.getElementById('beer-bottle-count').value);
+      const liquorType = document.getElementById('liquor-type').value;
+      const liquorName = document.getElementById('liquor-name').value;
+      const liquorCaseCount = parseInt(document.getElementById('liquor-case-count').value);
+      const liquorBottleCount = parseInt(document.getElementById('liquor-bottle-count').value);
+      const wineName = document.getElementById('wine-name').value;
+      const wineCaseCount = parseInt(document.getElementById('wine-case-count').value);
+      const wineBottleCount = parseInt(document.getElementById('wine-bottle-count').value);
+
+      // Add or update beer
+      if (beerName) {
+        const existingBeer = inventory.storage.beer.find(beer => beer.name === beerName);
+        if (existingBeer) {
+          existingBeer.caseCount = beerCaseCount;
+          existingBeer.bottleCount = beerBottleCount;
+        } else {
+          inventory.storage.beer.push({ name: beerName, caseCount: beerCaseCount, bottleCount: beerBottleCount });
+        }
+      }
+
+      // Add or update liquor
+      if (liquorName) {
+        const existingLiquor = inventory.storage.liquor.find(liquor => liquor.name === liquorName);
+        if (existingLiquor) {
+          existingLiquor.caseCount = liquorCaseCount;
+          existingLiquor.bottleCount = liquorBottleCount;
+        } else {
+          inventory.storage.liquor.push({ type: liquorType, name: liquorName, caseCount: liquorCaseCount, bottleCount: liquorBottleCount });
+        }
+      }
+
+      // Add or update wine
+      if (wineName) {
+        const existingWine = inventory.storage.wine.find(wine => wine.name === wineName);
+        if (existingWine) {
+          existingWine.caseCount = wineCaseCount;
+          existingWine.bottleCount = wineBottleCount;
+        } else {
+          inventory.storage.wine.push({ name: wineName, caseCount: wineCaseCount, bottleCount: wineBottleCount });
+        }
+      }
+
+      // Save and update display
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      updateDisplay();
+    });
+
+    // Update display
+    function updateDisplay() {
+      const storageList = document.getElementById('storage-list');
+      storageList.innerHTML = '';
+      inventory.storage.beer.forEach(beer => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${beer.name}: ${beer.caseCount} cases, ${beer.bottleCount} bottles`;
+        storageList.appendChild(listItem);
+      });
+      inventory.storage.liquor.forEach(liquor => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${liquor.name} (${liquor.type}): ${liquor.caseCount} cases, ${liquor.bottleCount} bottles`;
+        storageList.appendChild(listItem);
+      });
+      inventory.storage.wine.forEach(wine => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${wine.name}: ${wine.caseCount} cases, ${wine.bottleCount} bottles`;
+        storageList.appendChild(listItem);
+      });
+    }
+
+    // Load inventory when the page loads
+    document.addEventListener('DOMContentLoaded', updateDisplay);
+  </script>
 </body>
 </html>
